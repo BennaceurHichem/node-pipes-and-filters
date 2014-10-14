@@ -32,7 +32,7 @@ var Pipeline = (function() {
       this.wireupEvents(done);
     }
 
-    var continueExecution = function continueExecution(err, result) {
+    (function continueExecution(err, result) {
       // exit pipeline with an error
       if (err) {
         return emitter.emit('error', err);
@@ -51,15 +51,9 @@ var Pipeline = (function() {
       // take next filter from pending list, and continue execution
       var filter = pending.shift();
 
-      process.nextTick(function() {
-        // execute the filter function, with the (optional) context
-        filter.fn.call(filter.context, result, continueExecution);
-      });
-    };
-
-    process.nextTick(function() {
-      continueExecution(null, input);
-    });
+      // execute the filter function, with the (optional) context
+      filter.fn.call(filter.context, result, continueExecution);
+    })(null, input);
   };
 
   // Wireup the optional `done` callback with both `error` and `end` event listeners
